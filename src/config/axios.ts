@@ -1,7 +1,7 @@
 import axios, { Axios } from "axios";
 
 const API: Axios = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: process.env.APP_BASE_URL,
 });
 
 export default API;
