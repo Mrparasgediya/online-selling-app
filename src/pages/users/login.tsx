@@ -57,7 +57,7 @@ const LoginPage = () => {
           </Button>
         </form>
         <p className="font-medium text-lg flex items-center justify-center gap-2 w-full">
-          <span>Don't have an account?</span>
+          <span>Don not have an account?</span>
           <NextLink href="/users/register" passHref>
             <a className="border-b-2 border-blue-700">Register</a>
           </NextLink>
