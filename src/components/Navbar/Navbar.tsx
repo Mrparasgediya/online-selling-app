@@ -23,22 +23,23 @@ const Navbar: FC<INavbarProps> = ({
           <a className="font-medium text-lg ">Arth Creation</a>
         </NextLink>
         <div className="flex items-center gap-2">
-          {isLoggedIn ? (
-            <Fragment>
-              {router.pathname === "/" && isAdmin && (
-                <CustomLink link="/admin/products">
-                  <Button color="blue">Admin Panel</Button>
-                </CustomLink>
-              )}
-              <Button color="blue" onClick={handleLogoutUserClick}>
-                Logout
-              </Button>
-            </Fragment>
-          ) : (
-            <CustomLink link="/users/login">
-              <Button color="blue">Login</Button>
-            </CustomLink>
-          )}
+          {isAdmin &&
+            (isLoggedIn ? (
+              <Fragment>
+                {router.pathname === "/" && (
+                  <CustomLink link="/admin/products">
+                    <Button color="blue">Admin Panel</Button>
+                  </CustomLink>
+                )}
+                <Button color="blue" onClick={handleLogoutUserClick}>
+                  Logout
+                </Button>
+              </Fragment>
+            ) : (
+              <CustomLink link="/users/login">
+                <Button color="blue">Login</Button>
+              </CustomLink>
+            ))}
         </div>
       </div>
     </nav>
