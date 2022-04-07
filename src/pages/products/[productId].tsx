@@ -1,16 +1,15 @@
 import withLayout from "components/withLayout/withLayout";
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  GetStaticPaths,
-  GetStaticProps,
-  GetStaticPropsContext,
-} from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import React, { FC } from "react";
 import { ProductDocument } from "types/IProduct";
 import ProductNavigationButtons from "components/ProductNavigationButtons/ProductNavigationButtons";
 import ProductImageSlider from "components/ProductImageSlider/ProductImageSlider";
 import ProductImageGrid from "components/ProductImageGrid/ProductImageGrid";
+import { UserContextDetails, UserDocument } from "types/IUser";
+import { getUserDetailsFromContext } from "utils/utils";
+import { getErrorMessage } from "utils/error";
+import { AxiosResponse } from "axios";
+import API from "config/axios";
 
 interface IProductDetailsPageProps {
   product?: ProductDocument;
@@ -44,83 +43,35 @@ const ProductDetailsPage: FC<IProductDetailsPageProps> = ({
 
 export default withLayout(ProductDetailsPage);
 
-export const getStaticProps: GetStaticProps = async (
-  context: GetStaticPropsContext
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext
 ) => {
-  const productId = context.params.productId;
+  const productId = ctx.query.productId;
+  const props: { [key: string]: any } = {};
   try {
-    const result = await fetch(
-      `${process.env.APP_BASE_URL}/api/products/${productId}`
+    const { auth } = ctx.req.cookies;
+    if (auth) {
+      try {
+        const [user]: UserContextDetails = await getUserDetailsFromContext(ctx);
+        props.user = user;
+      } catch (error) {
+        // here no error will be processed because auth user is not recommended
+      }
+    }
+
+    const { data }: AxiosResponse<{ product: ProductDocument }> = await API.get(
+      `/api/products/${productId}`
     );
-    // set not found if product not found
-    if (result.status === 404) {
-      return {
-        notFound: true,
-      };
-    }
+
     // find product if product found
-    const product: ProductDocument = await result.json();
+    props.product = data;
     return {
-      props: { product },
+      props,
     };
   } catch (error) {
+    props.error = getErrorMessage(error);
     return {
-      props: { error: error.message },
+      props,
     };
   }
 };
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  try {
-    const result = await fetch(`${process.env.APP_BASE_URL}/api/products`);
-    // set not found if product not found
-    if (result.status === 404) {
-      return {
-        paths: [],
-        fallback: false,
-      };
-    }
-    // find product if product found
-    const { products }: { products: ProductDocument[] } = await result.json();
-    const paths = [];
-    for (let product of products) {
-      paths.push({ params: { productId: product._id.toString() } });
-    }
-    return {
-      paths: paths,
-      fallback: false,
-    };
-  } catch (error) {
-    return {
-      paths: [],
-      fallback: false,
-    };
-  }
-};
-
-// export const getServerSideProps: GetServerSideProps = async (
-//   context: GetServerSidePropsContext
-// ) => {
-//   const productId = context.query.productId;
-//   try {
-//     const result = await fetch(
-//       `${process.env.APP_BASE_URL}/api/products/${productId}`
-//     );
-//     // set not found if product not found
-//     if (result.status === 404) {
-//       return {
-//         notFound: true,
-//       };
-//     }
-//     // find product if product found
-//     const product: ProductDocument = await result.json();
-//     return {
-//       props: { product },
-//     };
-//   } catch (error) {
-//     console.log(error);
-//     return {
-//       props: { error: error.message },
-//     };
-//   }
-// };

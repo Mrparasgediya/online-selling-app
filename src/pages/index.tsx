@@ -1,8 +1,13 @@
 import Products from "components/Products/Products";
 import withLayout from "components/withLayout/withLayout";
-import { GetStaticProps, GetStaticPropsContext } from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { FC, Fragment } from "react";
 import { ProductDocument } from "types/IProduct";
+import API from "config/axios";
+import { AxiosResponse } from "axios";
+import { getErrorMessage } from "utils/error";
+import { getUserDetailsFromContext } from "utils/utils";
+import { UserContextDetails } from "types/IUser";
 
 interface IHomeProps {
   products?: ProductDocument[];
@@ -20,16 +25,32 @@ const Home: FC<IHomeProps> = ({ products }) => {
 
 export default withLayout(Home);
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext
+) => {
+  const props: { [key: string]: any } = {};
   try {
-    const res = await fetch(`${process.env.APP_BASE_URL}/api/products`);
-    const products: { products: ProductDocument[] } = await res.json();
+    const { auth } = ctx.req.cookies;
+    if (auth) {
+      try {
+        const [user]: UserContextDetails = await getUserDetailsFromContext(ctx);
+        props.user = user;
+      } catch (error) {
+        // here no error will be processed because auth user is not recommended
+      }
+    }
+
+    const { data }: AxiosResponse = await API.get(
+      `${process.env.APP_BASE_URL}/api/products`
+    );
+    props.products = data.products;
     return {
-      props: products,
+      props,
     };
   } catch (error) {
+    props.error = getErrorMessage(error);
     return {
-      props: { error: error.message },
+      props,
     };
   }
 };

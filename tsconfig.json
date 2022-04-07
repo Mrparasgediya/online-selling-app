@@ -13,6 +13,12 @@
       ],
       "components/*": [
         "./components/*"
+      ],
+      "config/*": [
+        "./config/*"
+      ],       
+      "context/*": [
+        "./context/*"
       ]
     },
     "target": "es5",

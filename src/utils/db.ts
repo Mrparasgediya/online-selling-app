@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const connectDB = async () => {
     if (mongoose.connections[0].readyState)
         return;
-    await mongoose.connect("mongodb://localhost:27017/online-selling-app", {
+    await mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true
     } as mongoose.ConnectOptions);
 }

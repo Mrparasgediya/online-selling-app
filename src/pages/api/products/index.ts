@@ -1,50 +1,61 @@
-import { NextApiHandler, NextApiResponse } from "next";
-import "types/IProduct";
-import Product from 'models/Product';
+import { NextApiRequest, NextApiResponse } from "next";
+import Product from "models/Product";
+import authMiddleware from "middlewares/auth.middleware";
+import adminMiddleware from "middlewares/admin.middleware";
+import IProduct from "types/IProduct";
+import { NextApiAuthRequest } from "types/NextApiAuthRequest";
 import { connectDB, disconnectDB } from "utils/db";
 import { checkIsValidPayload, setDataToObj } from "utils/utils";
-import IProduct from "types/IProduct";
+import { runMiddleware } from "utils/middleware";
+import { setApiErrorMessage } from "utils/error";
 
-const createNewProduct: NextApiHandler = async (req, res) => {
-  const validKeys: string[] = ['name', 'price', 'quantity', 'description'];
-  let isValidOperation: boolean = checkIsValidPayload(Object.keys(req.body), validKeys);
+const createNewProduct = async (
+  req: NextApiAuthRequest,
+  res: NextApiResponse
+) => {
   try {
-    if (!isValidOperation)
-      throw new Error("Enter valid data");
+    await runMiddleware(req, res, authMiddleware);
+    await runMiddleware(req, res, adminMiddleware);
+
+    const validKeys: string[] = ["name", "price", "description"];
+    let isValidOperation: boolean = checkIsValidPayload(
+      Object.keys(req.body),
+      validKeys
+    );
+    if (!isValidOperation) throw new Error("Enter valid data");
     const newProductData: IProduct = setDataToObj({}, req.body, validKeys);
-    newProductData.nextImageId = 1;
     const newProduct = new Product(newProductData);
     await connectDB();
     await newProduct.save();
     await disconnectDB();
     return res.status(201).send(newProduct);
   } catch (error) {
-    return res.status(400).send({ error: !error.errors ? error.message : error.errors[Object.keys(error.errors)[0]].properties.message });
+    return setApiErrorMessage(res, error);
   }
-}
+};
 
-const getAllProducts: NextApiHandler = async (req, res) => {
+const getAllProducts = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectDB();
     const products = await Product.find({});
     await disconnectDB();
     return res.send({ products });
   } catch (error) {
-    return res.status(400).send({
-      error: error.message
-    });
+    return setApiErrorMessage(res, error);
   }
-}
+};
 
-const productsHandler: NextApiHandler = (req, res) => {
+const allProductsHandler = (req: NextApiAuthRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "GET":
       return getAllProducts(req, res);
     case "POST":
       return createNewProduct(req, res);
     default:
-      return res.status(405).send({ error: `Method ${req.method} is not Allowed!` });
+      return res
+        .status(405)
+        .send({ error: `Method ${req.method} is not Allowed!` });
   }
-}
+};
 
-export default productsHandler;
+export default allProductsHandler;
