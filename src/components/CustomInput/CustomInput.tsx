@@ -9,7 +9,7 @@ interface IInputProps {
   [key: string]: any;
 }
 
-const Input: FC<IInputProps> = forwardRef<HTMLInputElement, IInputProps>(
+const CustomInput: FC<IInputProps> = forwardRef<HTMLInputElement, IInputProps>(
   ({ type, string, id, label, ...otherProps }, ref) => {
     return (
       <Fragment>
@@ -26,4 +26,5 @@ const Input: FC<IInputProps> = forwardRef<HTMLInputElement, IInputProps>(
   }
 );
 
-export default Input;
+CustomInput.displayName = "CustomInput";
+export default CustomInput;

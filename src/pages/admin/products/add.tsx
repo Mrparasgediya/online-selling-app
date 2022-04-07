@@ -5,8 +5,8 @@ import { NextRouter, useRouter } from "next/router";
 import API from "config/axios";
 import { useState } from "react";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
-import Input from "components/Input/Input";
-import TextArea from "components/TextArea/TextArea";
+import CustomInput from "components/CustomInput/CustomInput";
+import CustomTextArea from "components/CustomTextArea/CustomTextArea";
 import { getErrorMessage } from "utils/error";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getUserDetailsFromContext } from "utils/utils";
@@ -60,26 +60,26 @@ const AddNewProduct: FC<IAddNewProductProps> = ({ token }) => {
         onSubmit={handleFormSubmit}
         className="p-6 rounded-md  shadow-lg bg-white/60 backdrop-filter backdrop-blur-lg max-w-xl mx-auto flex flex-col gap-4"
       >
-        <Input
+        <CustomInput
           type="text"
           ref={productNameInputRef}
           label="Product Name"
           id="productName"
           required
         />
-        <Input
+        <CustomInput
           type="number"
           ref={productPriceInputRef}
           label="Product Price"
           id="productPrice"
           required
         />
-        <TextArea
+        <CustomTextArea
           ref={productDescriptionInputRef}
           label="Product Description"
           id="productDescription"
           required
-        ></TextArea>
+        ></CustomTextArea>
         <Button type="submit" color="blue">
           Add Product
         </Button>

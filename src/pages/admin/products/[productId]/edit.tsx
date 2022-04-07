@@ -1,8 +1,8 @@
 import { AxiosResponse } from "axios";
 import Button from "components/Button/Button";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
-import Input from "components/Input/Input";
-import TextArea from "components/TextArea/TextArea";
+import CustomInput from "components/CustomInput/CustomInput";
+import CustomTextArea from "components/CustomTextArea/CustomTextArea";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
@@ -77,7 +77,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
         onSubmit={handleFormSubmit}
         className="p-6 rounded-md  shadow-lg bg-white/60 backdrop-filter backdrop-blur-lg max-w-xl mx-auto flex flex-col gap-4"
       >
-        <Input
+        <CustomInput
           type="text"
           ref={productNameInputRef}
           label="Product Name"
@@ -91,7 +91,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
             }));
           }}
         />
-        <Input
+        <CustomInput
           type="number"
           ref={productPriceInputRef}
           label="Product Price"
@@ -106,7 +106,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
             }));
           }}
         />
-        <TextArea
+        <CustomTextArea
           ref={productDescriptionInputRef}
           label="Product Description"
           id="productDescription"
@@ -118,7 +118,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
               description: e.target.value,
             }));
           }}
-        ></TextArea>
+        ></CustomTextArea>
         <Button type="submit" color="blue">
           Edit Product
         </Button>

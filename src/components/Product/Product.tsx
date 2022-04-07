@@ -17,7 +17,7 @@ const Product: FC<IProductProps> = ({
         <CustomLink link={`/products/${_id.toString()}`}>
           <NextImage
             src={`/uploads/products/${images[0] || "default-image.jpg"}`}
-            alt="Product img"
+            alt={`${name}'s image`}
             objectFit="cover"
             objectPosition="center"
             height={400}

@@ -39,18 +39,14 @@ export const getServerSideProps: GetServerSideProps = async (
         // here no error will be processed because auth user is not recommended
       }
     }
-
     const { data }: AxiosResponse = await API.get(
       `${process.env.APP_BASE_URL}/api/products`
     );
-    props.products = data.products;
-    return {
-      props,
-    };
+    props.products = data.products || [];
   } catch (error) {
     props.error = getErrorMessage(error);
-    return {
-      props,
-    };
   }
+  return {
+    props,
+  };
 };

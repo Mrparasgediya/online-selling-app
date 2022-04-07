@@ -1,6 +1,6 @@
 import Button from "components/Button/Button";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
-import Input from "components/Input/Input";
+import CustomInput from "components/CustomInput/CustomInput";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { NextRouter, useRouter } from "next/router";
@@ -89,7 +89,7 @@ const EditProductImage: FC<IEditProductImageProps> = ({ token }) => {
           </div>
         </div>
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
-          <Input
+          <CustomInput
             type="file"
             accept="image/*"
             ref={productImageRef}

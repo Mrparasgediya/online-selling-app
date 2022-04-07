@@ -6,24 +6,36 @@ import CustomLink from "components/NextImageLink/NextImageLink";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { useState } from "react";
 import { ProductDocument } from "types/IProduct";
 import { getErrorMessage } from "utils/error";
 import { getUserDetailsFromContext } from "utils/utils";
+import cryptoJS from "crypto-js";
 
 interface IAdminProductsPageProps {
   products?: ProductDocument[];
   error?: string;
+  token?: string;
 }
 
-const AdminProductsPage: FC<IAdminProductsPageProps> = ({ products }) => {
+const AdminProductsPage: FC<IAdminProductsPageProps> = ({
+  products,
+  token,
+}) => {
   const [allProducts, setAllProducts] = useState<ProductDocument[]>(products);
   const [errorText, setErrorText] = useState<string>("");
 
   const onProductDelete = async (productId: string) => {
     try {
-      await API.delete(`/api/products/${productId}`);
+      await API.delete(`/api/products/${productId}`, {
+        headers: {
+          Authorization: `Barear ${await cryptoJS.AES.decrypt(
+            token,
+            process.env.CRYPTO_SECRET
+          ).toString(cryptoJS.enc.Utf8)}`,
+        },
+      });
       const newProducts = allProducts;
       const foundProductIdx = newProducts.findIndex(
         (product) => product._id.toString() === productId
@@ -59,7 +71,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   let props: { [key: string]: any } = {};
   try {
-    const [user, isAdmin] = await getUserDetailsFromContext(ctx);
+    const [user, isAdmin, token] = await getUserDetailsFromContext(ctx);
     if (!user || !isAdmin) {
       return {
         redirect: {
@@ -70,6 +82,10 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
+    props.token = await cryptoJS.AES.encrypt(
+      token,
+      process.env.CRYPTO_SECRET
+    ).toString();
 
     const { data: productResponse }: AxiosResponse = await API.get(
       `${process.env.APP_BASE_URL}/api/products`

@@ -7,7 +7,7 @@ interface ITextAreaProps {
   [key: string]: any;
 }
 
-const TextArea = forwardRef<HTMLTextAreaElement, ITextAreaProps>(
+const CustomTextArea = forwardRef<HTMLTextAreaElement, ITextAreaProps>(
   ({ required, label, id, children, ...otherProps }, ref) => {
     return (
       <Fragment>
@@ -26,4 +26,5 @@ const TextArea = forwardRef<HTMLTextAreaElement, ITextAreaProps>(
   }
 );
 
-export default TextArea;
+CustomTextArea.displayName = "CustomTextArea";
+export default CustomTextArea;

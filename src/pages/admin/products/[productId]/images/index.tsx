@@ -11,13 +11,15 @@ import Button from "components/Button/Button";
 import CustomLink from "components/NextImageLink/NextImageLink";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
 import { getUserDetailsFromContext } from "utils/utils";
+import cryptoJS from "crypto-js";
 
 interface IProductImagesProps {
   product?: ProductDocument;
   error?: string;
+  token?: string;
 }
 
-const ProductImages: FC<IProductImagesProps> = ({ product }) => {
+const ProductImages: FC<IProductImagesProps> = ({ product, token }) => {
   const [productImages, setProductImages] = useState<string[]>(
     (product && product.images) || []
   );
@@ -34,7 +36,15 @@ const ProductImages: FC<IProductImagesProps> = ({ product }) => {
         }
         // delete image from server
         await API.delete(
-          `/api/products/${product._id.toString()}/images/${imageName}`
+          `/api/products/${product._id.toString()}/images/${imageName}`,
+          {
+            headers: {
+              Authorization: `Barear ${await cryptoJS.AES.decrypt(
+                token,
+                process.env.CRYPTO_SECRET
+              ).toString(cryptoJS.enc.Utf8)}`,
+            },
+          }
         );
         const newProductImages = productImages;
         newProductImages.splice(foundProductImageIdx, 1);
@@ -84,7 +94,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const props: { [key: string]: any } = {};
   try {
-    const [user, isAdmin] = await getUserDetailsFromContext(ctx);
+    const [user, isAdmin, token] = await getUserDetailsFromContext(ctx);
     if (!user || !isAdmin) {
       return {
         redirect: {
@@ -95,6 +105,10 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
+    props.token = await cryptoJS.AES.encrypt(
+      token,
+      process.env.CRYPTO_SECRET
+    ).toString();
 
     const { data }: AxiosResponse = await API.get(
       `/api/products/${ctx.query.productId}`

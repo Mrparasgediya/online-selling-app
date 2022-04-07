@@ -17,7 +17,9 @@ const ProductNavigationButtons: FC<IProductNavigationButtonsProps> = ({
     <div className="flex items-center gap-2 md:gap-4">
       <CustomLink
         link={`https://wa.me/+918140329445?text=${encodeURI(
-          `Hello, I am interested in your product ${name} (product id:  ${id})`
+          `Hello, I am interested in your product ${name} (product id:  ${id}) link: ${
+            process.env.APP_BASE_URL
+          }/products/${id.toString()}`
         )}`}
       >
         <Button color="green">

@@ -37,5 +37,5 @@ export const getUserDetailsFromContext = async (
       headers: { Authorization: `Barear ${auth}` },
     }
   );
-  return [user, isAdminUser(user), auth];
+  return [user || null, isAdminUser(user), auth || null];
 };

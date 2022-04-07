@@ -1,6 +1,6 @@
 import Button from "components/Button/Button";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
-import Input from "components/Input/Input";
+import CustomInput from "components/CustomInput/CustomInput";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { NextRouter, useRouter } from "next/router";
@@ -37,14 +37,14 @@ const RegisterPage = () => {
           onSubmit={handleFormSubmit}
           className="p-6 rounded-md w-full shadow-lg bg-white/60 backdrop-filter backdrop-blur-lg max-w-xl mx-auto flex flex-col gap-4"
         >
-          <Input
+          <CustomInput
             ref={emailInputRef}
             type="email"
             label="Username"
             id="username"
             required
           />
-          <Input
+          <CustomInput
             ref={passwordInputRef}
             type="password"
             label="Password"

@@ -1,6 +1,6 @@
 import Button from "components/Button/Button";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
-import Input from "components/Input/Input";
+import CustomInput from "components/CustomInput/CustomInput";
 import withLayout from "components/withLayout/withLayout";
 import React, { FC, FormEvent, useEffect } from "react";
 import { useRef } from "react";
@@ -87,7 +87,7 @@ const AddProductImage: FC<IAddProductImageProps> = ({ token }) => {
           </div>
         </div>
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
-          <Input
+          <CustomInput
             type="file"
             accept="image/*"
             ref={productImageRef}
