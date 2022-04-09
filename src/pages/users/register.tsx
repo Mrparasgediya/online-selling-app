@@ -71,15 +71,17 @@ export default withLayout(RegisterPage);
 export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext
 ) => {
-  const [user] = await getUserDetailsFromContext(ctx);
-  if (user) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+  try {
+    const [user] = await getUserDetailsFromContext(ctx);
+    if (user) {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
+  } catch (error) {}
   return {
     props: {},
   };

@@ -1,10 +1,6 @@
 import { AxiosResponse } from "axios";
 import API from "config/axios";
-import {
-  GetServerSidePropsContext,
-  GetStaticPathsContext,
-  GetStaticPropsContext,
-} from "next";
+import { GetServerSidePropsContext } from "next";
 import { UserContextDetails, UserDocument } from "types/IUser";
 import { isAdminUser } from "./user";
 
