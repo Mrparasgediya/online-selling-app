@@ -27,7 +27,7 @@ const Navbar: FC<INavbarProps> = ({ isAdmin, isLoggedIn }) => {
         <div className="flex items-center gap-2">
           {isLoggedIn && (
             <Fragment>
-              {isAdmin && router.pathname === "/" && (
+              {isAdmin && (
                 <CustomLink link="/admin/products">
                   <Button color="blue">Admin Panel</Button>
                 </CustomLink>
