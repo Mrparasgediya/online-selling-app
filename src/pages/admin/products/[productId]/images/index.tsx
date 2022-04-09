@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React, { MouseEventHandler, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FC } from "react";
 import { ProductDocument } from "types/IProduct";
 import { getErrorMessage } from "utils/error";
@@ -11,15 +11,14 @@ import Button from "components/Button/Button";
 import CustomLink from "components/NextImageLink/NextImageLink";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
 import { getUserDetailsFromContext } from "utils/utils";
-import cryptoJS from "crypto-js";
+import { getToken } from "utils/cookie";
 
 interface IProductImagesProps {
   product?: ProductDocument;
   error?: string;
-  token?: string;
 }
 
-const ProductImages: FC<IProductImagesProps> = ({ product, token }) => {
+const ProductImages: FC<IProductImagesProps> = ({ product }) => {
   const [productImages, setProductImages] = useState<string[]>(
     (product && product.images) || []
   );
@@ -39,10 +38,7 @@ const ProductImages: FC<IProductImagesProps> = ({ product, token }) => {
           `/api/products/${product._id.toString()}/images/${imageName}`,
           {
             headers: {
-              Authorization: `Barear ${await cryptoJS.AES.decrypt(
-                token,
-                process.env.CRYPTO_SECRET
-              ).toString(cryptoJS.enc.Utf8)}`,
+              Authorization: `Barear ${getToken()}`,
             },
           }
         );
@@ -94,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const props: { [key: string]: any } = {};
   try {
-    const [user, isAdmin, token] = await getUserDetailsFromContext(ctx);
+    const [user, isAdmin] = await getUserDetailsFromContext(ctx);
     if (!user || !isAdmin) {
       return {
         redirect: {
@@ -105,10 +101,6 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
-    props.token = await cryptoJS.AES.encrypt(
-      token,
-      process.env.CRYPTO_SECRET
-    ).toString();
 
     const { data }: AxiosResponse = await API.get(
       `/api/products/${ctx.query.productId}`

@@ -9,6 +9,8 @@ import { getErrorMessage } from "utils/error";
 import NextLink from "next/link";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getUserDetailsFromContext } from "utils/utils";
+import { AxiosResponse } from "axios";
+import { saveToken } from "utils/cookie";
 
 const LoginPage = () => {
   const router: NextRouter = useRouter();
@@ -19,10 +21,11 @@ const LoginPage = () => {
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/api/users/login", {
+      const { data }: AxiosResponse = await API.post("/api/users/login", {
         username: emailInputRef.current.value,
         password: passwordInputRef.current.value,
       });
+      saveToken(data.token);
       router.push("/");
     } catch (error) {
       setErrorText(getErrorMessage(error));

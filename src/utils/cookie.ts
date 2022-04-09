@@ -1,4 +1,4 @@
-import { NextApiResponse } from "next";
+import cookie from "js-cookie";
 
 export const cookieOptions = {
   httpOnly: true,
@@ -8,24 +8,18 @@ export const cookieOptions = {
   secure: process.env.NODE_ENV === "production",
 };
 
-export const setCookie = (
-  res: NextApiResponse,
-  name: string,
-  value: string,
-  options: object
-) => {
-  let cookieStr: string = `${name}=${
-    typeof value === "object" ? JSON.stringify(value) : value
-  }; `;
-
-  for (let key of Object.keys(options))
-    if (key !== "secure") cookieStr += `${key}=${options[key]}; `;
-
-  if (process.env.NODE_ENV === "production") {
-    cookieStr += "Secure;";
-  }
-  res.setHeader("Set-Cookie", cookieStr);
+export const saveToken = (token: string) => {
+  cookie.set("auth", token, {
+    expires: 8 / 24,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  });
 };
 
-export const clearCookie = (res: NextApiResponse, name: string) =>
-  setCookie(res, name, "0", { ...cookieOptions, path: "/", "Max-Age": 1 });
+export const getToken = (): string | undefined => {
+  return cookie.get("auth");
+};
+
+export const removeToken = () => {
+  cookie.remove("auth");
+};

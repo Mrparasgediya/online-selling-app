@@ -5,7 +5,6 @@ import { UserDocument } from "types/IUser";
 import { connectDB, disconnectDB } from "utils/db";
 import { checkIsValidPayload } from "utils/utils";
 import { generateToken } from "utils/token";
-import { cookieOptions, setCookie } from "utils/cookie";
 import { setApiErrorMessage } from "utils/error";
 
 const loginUser: NextApiHandler = async (req, res) => {
@@ -27,14 +26,10 @@ const loginUser: NextApiHandler = async (req, res) => {
       throw new Error("Password Doesn't matched!");
     }
 
-    setCookie(
-      res,
-      "auth",
-      await generateToken(foundUser._id.toString()),
-      cookieOptions
-    );
-
-    return res.send({ message: "Logged in successfully!" });
+    return res.send({
+      token: await generateToken(foundUser._id.toString()),
+      user: foundUser,
+    });
   } catch (error) {
     return setApiErrorMessage(res, error);
   }

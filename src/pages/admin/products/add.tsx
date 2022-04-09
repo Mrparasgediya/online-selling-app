@@ -1,6 +1,6 @@
 import Button from "components/Button/Button";
 import withLayout from "components/withLayout/withLayout";
-import React, { FC, FormEvent, useRef } from "react";
+import React, { FormEvent, useRef } from "react";
 import { NextRouter, useRouter } from "next/router";
 import API from "config/axios";
 import { useState } from "react";
@@ -10,13 +10,9 @@ import CustomTextArea from "components/CustomTextArea/CustomTextArea";
 import { getErrorMessage } from "utils/error";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getUserDetailsFromContext } from "utils/utils";
-import cryptoJS from "crypto-js";
+import { getToken } from "utils/cookie";
 
-interface IAddNewProductProps {
-  token: string;
-}
-
-const AddNewProduct: FC<IAddNewProductProps> = ({ token }) => {
+const AddNewProduct = () => {
   const router: NextRouter = useRouter();
   const productNameInputRef = useRef<HTMLInputElement>(null);
   const productDescriptionInputRef = useRef<HTMLTextAreaElement>(null);
@@ -40,10 +36,7 @@ const AddNewProduct: FC<IAddNewProductProps> = ({ token }) => {
           },
           {
             headers: {
-              Authorization: `Barear ${await cryptoJS.AES.decrypt(
-                token,
-                process.env.CRYPTO_SECRET
-              ).toString(cryptoJS.enc.Utf8)}`,
+              Authorization: `Barear ${getToken()}`,
             },
           }
         );
@@ -95,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const props: { [key: string]: any } = {};
   try {
-    const [user, isAdmin, token] = await getUserDetailsFromContext(ctx);
+    const [user, isAdmin] = await getUserDetailsFromContext(ctx);
     if (!user || !isAdmin) {
       return {
         redirect: {
@@ -106,10 +99,6 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
-    props.token = await cryptoJS.AES.encrypt(
-      token,
-      process.env.CRYPTO_SECRET
-    ).toString();
   } catch (error) {
     props.error = getErrorMessage(error);
   }

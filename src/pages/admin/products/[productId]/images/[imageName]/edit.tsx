@@ -11,12 +11,9 @@ import { getImageUrlFromFile } from "utils/file-client";
 import NextImage from "next/image";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getUserDetailsFromContext } from "utils/utils";
-import cryptoJS from "crypto-js";
+import { getToken } from "utils/cookie";
 
-interface IEditProductImageProps {
-  token: string;
-}
-const EditProductImage: FC<IEditProductImageProps> = ({ token }) => {
+const EditProductImage = () => {
   const router: NextRouter = useRouter();
   const { productId, imageName } = router.query;
   const [errorText, setErrorText] = useState<string>("");
@@ -38,10 +35,7 @@ const EditProductImage: FC<IEditProductImageProps> = ({ token }) => {
             formData,
             {
               headers: {
-                Authorization: `Barear ${await cryptoJS.AES.decrypt(
-                  token,
-                  process.env.CRYPTO_SECRET
-                ).toString(cryptoJS.enc.Utf8)}`,
+                Authorization: `Barear ${getToken()}`,
               },
             }
           );
@@ -125,10 +119,6 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
-    props.token = await cryptoJS.AES.encrypt(
-      token,
-      process.env.CRYPTO_SECRET
-    ).toString();
   } catch (error) {
     props.error = getErrorMessage(error);
   }

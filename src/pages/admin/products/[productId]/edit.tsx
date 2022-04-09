@@ -12,14 +12,13 @@ import { ProductDocument } from "types/IProduct";
 import { getErrorMessage } from "utils/error";
 import { getUserDetailsFromContext } from "utils/utils";
 import validator from "validator";
-import cryptoJS from "crypto-js";
+import { getToken } from "utils/cookie";
 
 interface IEditProductPageProps {
   error?: string;
   product?: ProductDocument;
-  token?: string;
 }
-const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
+const EditProductPage: FC<IEditProductPageProps> = ({ product }) => {
   const { _id, name, description, price } = product;
   const router: NextRouter = useRouter();
   const productNameInputRef = useRef<HTMLInputElement>(null);
@@ -56,10 +55,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product, token }) => {
           dataForPayload,
           {
             headers: {
-              Authorization: `Barear ${await cryptoJS.AES.decrypt(
-                token,
-                process.env.CRYPTO_SECRET
-              ).toString(cryptoJS.enc.Utf8)}`,
+              Authorization: `Barear ${getToken()}`,
             },
           }
         );
@@ -134,7 +130,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const props: { [key: string]: any } = {};
   try {
-    const [user, isAdmin, token] = await getUserDetailsFromContext(ctx);
+    const [user, isAdmin] = await getUserDetailsFromContext(ctx);
     if (!user || !isAdmin) {
       return {
         redirect: {
@@ -145,10 +141,6 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
-    props.token = await cryptoJS.AES.encrypt(
-      token,
-      process.env.CRYPTO_SECRET
-    ).toString();
 
     const { data: productResponse }: AxiosResponse = await API.get(
       `/api/products/${ctx.query.productId}`

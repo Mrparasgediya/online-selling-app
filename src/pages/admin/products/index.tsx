@@ -6,23 +6,19 @@ import CustomLink from "components/NextImageLink/NextImageLink";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import { useState } from "react";
 import { ProductDocument } from "types/IProduct";
+import { getToken } from "utils/cookie";
 import { getErrorMessage } from "utils/error";
 import { getUserDetailsFromContext } from "utils/utils";
-import cryptoJS from "crypto-js";
 
 interface IAdminProductsPageProps {
   products?: ProductDocument[];
   error?: string;
-  token?: string;
 }
 
-const AdminProductsPage: FC<IAdminProductsPageProps> = ({
-  products,
-  token,
-}) => {
+const AdminProductsPage: FC<IAdminProductsPageProps> = ({ products }) => {
   const [allProducts, setAllProducts] = useState<ProductDocument[]>(products);
   const [errorText, setErrorText] = useState<string>("");
 
@@ -30,10 +26,7 @@ const AdminProductsPage: FC<IAdminProductsPageProps> = ({
     try {
       await API.delete(`/api/products/${productId}`, {
         headers: {
-          Authorization: `Barear ${await cryptoJS.AES.decrypt(
-            token,
-            process.env.CRYPTO_SECRET
-          ).toString(cryptoJS.enc.Utf8)}`,
+          Authorization: `Barear ${getToken()}`,
         },
       });
       const newProducts = allProducts;
@@ -82,10 +75,6 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
-    props.token = await cryptoJS.AES.encrypt(
-      token,
-      process.env.CRYPTO_SECRET
-    ).toString();
 
     const { data: productResponse }: AxiosResponse = await API.get(
       `${process.env.APP_BASE_URL}/api/products`

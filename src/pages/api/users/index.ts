@@ -6,6 +6,7 @@ import { UserDocument } from "types/IUser";
 import { connectDB, disconnectDB } from "utils/db";
 import { setApiErrorMessage } from "utils/error";
 import { runMiddleware } from "utils/middleware";
+import { generateToken } from "utils/token";
 import { checkIsValidPayload } from "utils/utils";
 
 const createNewUser: NextApiHandler = async (req, res) => {
@@ -21,7 +22,8 @@ const createNewUser: NextApiHandler = async (req, res) => {
     await connectDB();
     await newUser.save();
     await disconnectDB();
-    return res.send({ user: newUser });
+    const token = await generateToken(newUser._id.toString());
+    return res.send({ user: newUser, token });
   } catch (error) {
     return setApiErrorMessage(res, error);
   }
