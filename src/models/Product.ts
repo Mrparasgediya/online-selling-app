@@ -29,26 +29,30 @@ const productSchema: mongoose.Schema<IProduct> = new mongoose.Schema<IProduct>(
         message: "Enter valid product description",
       },
     },
-    nextImageId: { type: Number, default: 1 },
-    images: [{ type: String, required: [true, "Enter Product image file"] }],
+    images: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Image",
+      },
+    ],
   },
   { timestamps: true }
 );
 
 productSchema.pre("remove", async function () {
   const product: ProductDocument = this;
-  if (product.images && product.images.length) {
-    for (let image of product.images) {
-      let imagePath: string = path.join(
-        ".",
-        "public",
-        "uploads",
-        "products",
-        image as string
-      );
-      if (await isFileExists(imagePath)) await fs.unlink(imagePath);
-    }
-  }
+  // if (product.images && product.images.length) {
+  //   for (let image of product.images) {
+  //     let imagePath: string = path.join(
+  //       ".",
+  //       "public",
+  //       "uploads",
+  //       "products",
+  //       image as string
+  //     );
+  //     if (await isFileExists(imagePath)) await fs.unlink(imagePath);
+  //   }
+  // }
 });
 
 const Product: mongoose.Model<IProduct> =

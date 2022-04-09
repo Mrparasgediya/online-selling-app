@@ -11,12 +11,17 @@ interface IProductProps {
 const Product: FC<IProductProps> = ({
   product: { name, price, _id, images },
 }) => {
+  const defaultImageUrl = "/uploads/products/default-image.jpg";
   return (
     <div className="h-60 md:h-72 overflow-hidden cursor-pointer flex items-center flex-col w-auto rounded-md  shadow-lg bg-white/70 backdrop-filter backdrop-blur-lg">
       <div className="flex-1 overflow-hidden">
         <CustomLink link={`/products/${_id.toString()}`}>
           <NextImage
-            src={`/uploads/products/${images[0] || "default-image.jpg"}`}
+            src={images[0] ? (images[0].src as string) : defaultImageUrl}
+            placeholder="blur"
+            blurDataURL={
+              (images[0] && (images[0].blur as string)) || defaultImageUrl
+            }
             alt={`${name}'s image`}
             objectFit="cover"
             objectPosition="center"

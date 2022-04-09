@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import withLayout from "components/withLayout/withLayout";
 import API from "config/axios";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FC } from "react";
 import { ProductDocument } from "types/IProduct";
 import { getErrorMessage } from "utils/error";
@@ -12,6 +12,7 @@ import CustomLink from "components/NextImageLink/NextImageLink";
 import ErrorMessage from "components/ErrorMessage/ErrorMessage";
 import { getUserDetailsFromContext } from "utils/utils";
 import { getToken } from "utils/cookie";
+import { ImageDocument } from "types/IImage";
 
 interface IProductImagesProps {
   product?: ProductDocument;
@@ -19,23 +20,24 @@ interface IProductImagesProps {
 }
 
 const ProductImages: FC<IProductImagesProps> = ({ product }) => {
-  const [productImages, setProductImages] = useState<string[]>(
+  const [productImages, setProductImages] = useState<ImageDocument[]>(
     (product && product.images) || []
   );
+
   const [errorText, setErrorText] = useState<string>("");
 
   const onDeleteImage = (): ((string) => void) => {
-    return async (imageName: string) => {
+    return async (imageId: string) => {
       try {
-        const foundProductImageIdx = productImages.findIndex(
-          (currImage) => currImage === imageName
+        const foundProductImageIdx = product.images.findIndex(
+          (image) => image._id.toString() === imageId
         );
         if (foundProductImageIdx === -1) {
           throw new Error("Image not found in products");
         }
         // delete image from server
         await API.delete(
-          `/api/products/${product._id.toString()}/images/${imageName}`,
+          `/api/products/${product._id.toString()}/images/${imageId}`,
           {
             headers: {
               Authorization: `Barear ${getToken()}`,
@@ -69,14 +71,16 @@ const ProductImages: FC<IProductImagesProps> = ({ product }) => {
         <div className="grid grid-cols-4 gap-4">
           {(productImages &&
             productImages.length &&
-            productImages.map((image, idx) => (
-              <AdminProductImageItem
-                onDeleteImage={onDeleteImage}
-                editImageUrl={`/admin/products/${product._id.toString()}/images/${image}/edit`}
-                image={image}
-                key={idx}
-              />
-            ))) || <p className="font-medium text-lg">There is no images</p>}
+            productImages.map((image, idx) => {
+              return (
+                <AdminProductImageItem
+                  onDeleteImage={onDeleteImage}
+                  editImageUrl={`/admin/products/${product._id.toString()}/images/${image._id.toString()}/edit`}
+                  image={image}
+                  key={idx}
+                />
+              );
+            })) || <p className="font-medium text-lg">There is no images</p>}
         </div>
       )}
     </div>

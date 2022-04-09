@@ -12,14 +12,20 @@ import NextImage from "next/image";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getUserDetailsFromContext } from "utils/utils";
 import { getToken } from "utils/cookie";
+import { AxiosResponse } from "axios";
+import { ImageDocument } from "types/IImage";
 
-const EditProductImage = () => {
+interface IEditProductImageProps {
+  image: ImageDocument;
+}
+
+const EditProductImage: FC<IEditProductImageProps> = ({ image }) => {
   const router: NextRouter = useRouter();
-  const { productId, imageName } = router.query;
+  const { productId, imageId } = router.query;
   const [errorText, setErrorText] = useState<string>("");
   const productImageRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string>(
-    `/uploads/products/${imageName || "default-image.jpg"}`
+    (image && (image.src as string)) || `/uploads/products/default-image.jpg`
   );
 
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -31,7 +37,7 @@ const EditProductImage = () => {
           const formData: FormData = new FormData();
           formData.append("image", file);
           await API.put(
-            `/api/products/${productId}/images/${imageName}`,
+            `/api/products/${productId}/images/${imageId}`,
             formData,
             {
               headers: {
@@ -119,6 +125,10 @@ export const getServerSideProps: GetServerSideProps = async (
     }
     // set user to props
     props.user = user;
+    const { data }: AxiosResponse = await API.get(
+      `/api/products/${ctx.query.productId}/images/${ctx.query.imageId}`
+    );
+    props.image = data;
   } catch (error) {
     props.error = getErrorMessage(error);
   }

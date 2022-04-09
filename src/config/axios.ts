@@ -2,9 +2,9 @@ import axios, { Axios } from "axios";
 
 const API: Axios = axios.create({
   baseURL:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.APP_BASE_URL,
+    process.env.NODE_ENV === "production"
+      ? "https://arth-creation.vercel.app"
+      : "http://localhost:3000",
 });
 
 export default API;

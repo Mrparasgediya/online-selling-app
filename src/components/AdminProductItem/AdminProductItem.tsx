@@ -13,11 +13,15 @@ const AdminProductItem: FC<IAdminProductItemProps> = ({
   product: { images, name, price, description, _id },
   onProductDelete,
 }) => {
+  const defaultImageUrl = "/uploads/products/default-image.jpg";
+
   return (
     <div className="flex shadow-lg bg-white/60 backdrop-filter backdrop-blur-md items-start max-w-full rounded-lg overflow-hidden">
       <div className="flex h-full w-[120px]">
         <NextImage
-          src={`/uploads/products/${images[0] || "default-image.jpg"}`}
+          src={(images[0].src as string) || defaultImageUrl}
+          blurDataURL={(images[0].blur as string) || defaultImageUrl}
+          placeholder="blur"
           height={180}
           width={140}
           objectFit="cover"

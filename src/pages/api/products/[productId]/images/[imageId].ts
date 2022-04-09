@@ -1,19 +1,31 @@
 import { NextApiHandler, NextApiResponse } from "next";
 import multer from "multer";
-import fs from "fs/promises";
-import path from "path";
 import Product from "models/Product";
 import authMiddleware from "middlewares/auth.middleware";
 import adminMiddleware from "middlewares/admin.middleware";
 import { NextApiAuthFileRequest } from "types/NextApiAuthFileRequest";
 import { runMiddleware } from "utils/middleware";
 import { connectDB, disconnectDB } from "utils/db";
-import { isFileExists } from "utils/file-api.";
 import { setApiErrorMessage } from "utils/error";
+import Image from "models/Image";
+import { ImageDocument } from "types/IImage";
+import sharp from "sharp";
+
+const getImage: NextApiHandler = async (req, res) => {
+  try {
+    await connectDB();
+    const foundImage = await Image.findById(req.query.imageId);
+    await disconnectDB();
+    if (!foundImage) throw { code: 404, message: "Image not found" };
+    return res.send(foundImage);
+  } catch (error) {
+    return setApiErrorMessage(res, error);
+  }
+};
 
 const deleteProductImage: NextApiHandler = async (req, res) => {
   try {
-    const { productId, imageName } = req.query;
+    const { productId, imageId } = req.query;
     await runMiddleware(req, res, authMiddleware);
     await runMiddleware(req, res, adminMiddleware);
 
@@ -23,19 +35,15 @@ const deleteProductImage: NextApiHandler = async (req, res) => {
       await disconnectDB();
       throw { code: 404, message: "Product not found!" };
     }
-    const foundProductImageIndex = foundProduct.images.findIndex(
-      (currentImage) => currentImage === imageName
-    );
-    if (foundProductImageIndex === -1) {
+
+    const foundImage = await Image.findById(imageId);
+    if (!foundImage) {
       await disconnectDB();
       throw { code: 404, message: "Product Image not found!" };
     }
-    await fs.unlink(
-      path.join(".", "public", "uploads", "products", imageName as string)
-    );
-    foundProduct.images.splice(foundProductImageIndex, 1);
-    await foundProduct.save();
+    await foundImage.remove();
     await disconnectDB();
+
     return res.send({ message: "Product image is deleted" });
   } catch (error) {
     return setApiErrorMessage(res, error);
@@ -53,10 +61,12 @@ const updateProductImage = async (
   res: NextApiResponse
 ) => {
   try {
-    const { productId, imageName } = req.query;
+    const { productId, imageId } = req.query;
     await runMiddleware(req, res, authMiddleware);
     await runMiddleware(req, res, adminMiddleware);
     await runMiddleware(req, res, multer({}).single("image"));
+    if (!req.file || !req.file.buffer) throw new Error("Enter product image!");
+
     await connectDB();
     const foundProduct = await Product.findById(productId);
     if (!foundProduct) {
@@ -64,43 +74,22 @@ const updateProductImage = async (
       throw { code: 404, message: "Product not found!" };
     }
     const foundProductImageIndex = foundProduct.images.findIndex(
-      (currentImage) => currentImage === imageName
+      (currentImage) => currentImage.toString() === (imageId as string)
     );
     if (foundProductImageIndex === -1) {
       await disconnectDB();
       throw { code: 404, message: "Product Image not found!" };
     }
     // check file extension is same or not
-    const fileExtension = req.file.originalname.split(".").slice(-1)[0];
-    const baseUploadUrl = path.join(".", "public", "uploads", "products");
-    if (
-      `.${fileExtension}` ===
-      path.extname(path.join(baseUploadUrl, imageName as string))
-    ) {
-      // upload new file
-      await fs.writeFile(
-        path.join(baseUploadUrl, imageName as string),
-        req.file.buffer
-      );
-    } else {
-      // change file name
-      const newFileName = `${
-        (imageName as string).split(".")[0]
-      }.${fileExtension}`;
-      // save new file
-      await fs.writeFile(
-        path.join(baseUploadUrl, newFileName),
-        req.file.buffer
-      );
-      // remove old file
-      if (await isFileExists(path.join(baseUploadUrl, imageName as string))) {
-        await fs.unlink(path.join(baseUploadUrl, imageName as string));
-      }
-      // change new file name in arr
-      foundProduct.images[foundProductImageIndex] = newFileName;
-      await foundProduct.save();
+    const foundImage: ImageDocument = await Image.findById(imageId);
+    if (!foundImage) {
+      await disconnectDB();
+      throw { code: 404, message: "Product Image not found!" };
     }
-    // remove file if file extension is not same
+
+    foundImage.src = await sharp(req.file.buffer).resize(350, 400).toBuffer();
+    foundImage.blur = await sharp(req.file.buffer).resize(20, 20).toBuffer();
+    await foundImage.save();
     await disconnectDB();
     return res.send({ message: "Product image updated!" });
   } catch (error) {
@@ -113,6 +102,8 @@ const productImageHandler = (
   res: NextApiResponse
 ) => {
   switch (req.method) {
+    case "GET":
+      return getImage(req, res);
     case "DELETE":
       return deleteProductImage(req, res);
     case "PUT":

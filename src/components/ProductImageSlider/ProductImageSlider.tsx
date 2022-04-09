@@ -6,9 +6,10 @@ import NextImage from "next/image";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import IImage from "types/IImage";
 
 interface IProductImageSliderProps {
-  images: string[];
+  images: IImage[];
 }
 
 const ProductImageSlider: FC<IProductImageSliderProps> = ({ images }) => {

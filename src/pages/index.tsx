@@ -44,7 +44,6 @@ export const getServerSideProps: GetServerSideProps = async (
     const { data }: AxiosResponse = await API.get(`/api/products`);
     props.products = data.products || [];
   } catch (error) {
-    console.log(error);
     props.error = getErrorMessage(error);
   }
   return {

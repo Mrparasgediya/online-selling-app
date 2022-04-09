@@ -8,6 +8,7 @@ import { connectDB, disconnectDB } from "utils/db";
 import { checkIsValidPayload, setDataToObj } from "utils/utils";
 import { runMiddleware } from "utils/middleware";
 import { setApiErrorMessage } from "utils/error";
+import Image from "models/Image";
 
 const createNewProduct = async (
   req: NextApiAuthRequest,
@@ -37,7 +38,10 @@ const createNewProduct = async (
 const getAllProducts = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectDB();
-    const products = await Product.find({});
+    const products = await Product.find({}).populate({
+      path: "images",
+      model: Image,
+    });
     await disconnectDB();
     return res.send({ products });
   } catch (error) {

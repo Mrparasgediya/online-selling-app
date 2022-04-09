@@ -1,7 +1,5 @@
 import { NextApiResponse } from "next";
 import multer from "multer";
-import fs from "fs/promises";
-import path from "path";
 import Product from "models/Product";
 import authMiddleware from "middlewares/auth.middleware";
 import adminMiddleware from "middlewares/admin.middleware";
@@ -9,6 +7,9 @@ import { NextApiAuthFileRequest } from "types/NextApiAuthFileRequest";
 import { runMiddleware } from "utils/middleware";
 import { connectDB, disconnectDB } from "utils/db";
 import { setApiErrorMessage } from "utils/error";
+import sharp from "sharp";
+import { ImageDocument } from "types/IImage";
+import Image from "models/Image";
 
 const upload = multer({});
 
@@ -34,18 +35,20 @@ const uploadProductImage = async (
       await disconnectDB();
       throw { code: 404, message: "Product not found!" };
     }
+    if (!req.file || !req.file.buffer)
+      throw new Error("Enter product image file");
 
-    const fileExtension = req.file.originalname.split(".").slice(-1);
-    const newFileName = `${productId}-${foundProduct.nextImageId}.${fileExtension}`;
-    foundProduct.images.push(newFileName);
-    foundProduct.nextImageId++;
-    await fs.writeFile(
-      path.join(".", "public", "uploads", "products", newFileName),
-      req.file.buffer
-    );
-    await foundProduct.save();
+    const newImage: ImageDocument = new Image({
+      src: await sharp(req.file.buffer).resize(350, 400).toBuffer(),
+      blur: await sharp(req.file.buffer).resize(20, 20).toBuffer(),
+      productId: req.query.productId,
+    });
+
+    await connectDB();
+    await newImage.save();
     await disconnectDB();
-    return res.send(foundProduct);
+
+    return res.send({ image: newImage });
   } catch (error) {
     return setApiErrorMessage(res, error);
   }

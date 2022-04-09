@@ -4,6 +4,7 @@ import { UserDocument } from "types/IUser";
 import { NextApiAuthRequest } from "types/NextApiAuthRequest";
 import { connectDB, disconnectDB } from "utils/db";
 import jwt from "jsonwebtoken";
+import { setApiErrorMessage } from "utils/error";
 
 const authMiddleware = async (
   req: NextApiAuthRequest,
@@ -23,11 +24,7 @@ const authMiddleware = async (
     req.user = foundUser;
     return next(req, res);
   } catch (error) {
-    return res.status(error.code || 400).send({
-      error: !error.errors
-        ? error.message
-        : error.errors[Object.keys(error.errors)[0]].properties.message,
-    });
+    return setApiErrorMessage(res, error);
   }
 };
 

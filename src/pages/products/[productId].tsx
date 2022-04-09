@@ -63,7 +63,6 @@ export const getServerSideProps: GetServerSideProps = async (
     const { data }: AxiosResponse<{ product: ProductDocument }> = await API.get(
       `/api/products/${productId}`
     );
-
     // find product if product found
     props.product = data;
     return {

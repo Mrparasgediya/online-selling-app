@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useState } from "react";
 import NextImage from "next/image";
+import IImage from "types/IImage";
 
 interface IProductImageGridProps {
-  images: string[];
+  images: IImage[];
 }
 
 const ProductImageGrid: FC<IProductImageGridProps> = ({ images }) => {
@@ -14,13 +15,15 @@ const ProductImageGrid: FC<IProductImageGridProps> = ({ images }) => {
     }
   }, []);
 
+  const defaultImageUrl = "/uploads/products/default-image.jpg";
+
   return (
     isValid && (
       <div className="grid grid-cols-2 gap-2">
         {images.map((image, idx) => (
           <NextImage
             key={idx}
-            src={`/uploads/products/${image}`}
+            src={(image.src as string) || defaultImageUrl}
             alt="Product img"
             objectFit="cover"
             objectPosition="center"
