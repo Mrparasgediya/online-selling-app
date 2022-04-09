@@ -48,6 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const productId = ctx.query.productId;
   const props: { [key: string]: any } = {};
+  props.base_url = process.env.APP_BASE_URL;
   try {
     const { auth } = ctx.req.cookies;
     if (auth) {

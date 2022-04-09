@@ -12,6 +12,7 @@ import { UserContextDetails } from "types/IUser";
 interface IHomeProps {
   products?: ProductDocument[];
   error?: string;
+  base_url?: string;
 }
 
 const Home: FC<IHomeProps> = ({ products }) => {
@@ -29,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext
 ) => {
   const props: { [key: string]: any } = {};
+  props.base_url = process.env.APP_BASE_URL;
   try {
     const { auth } = ctx.req.cookies;
     if (auth) {
@@ -39,11 +41,10 @@ export const getServerSideProps: GetServerSideProps = async (
         // here no error will be processed because auth user is not recommended
       }
     }
-    const { data }: AxiosResponse = await API.get(
-      `${process.env.APP_BASE_URL}/api/products`
-    );
+    const { data }: AxiosResponse = await API.get(`/api/products`);
     props.products = data.products || [];
   } catch (error) {
+    console.log(error);
     props.error = getErrorMessage(error);
   }
   return {
