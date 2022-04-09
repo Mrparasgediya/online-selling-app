@@ -28,6 +28,7 @@ const createNewUser: NextApiHandler = async (req, res) => {
     return setApiErrorMessage(res, error);
   }
 };
+
 const getAllUsers: NextApiHandler = async (req, res) => {
   try {
     await runMiddleware(req, res, authMiddleware);
@@ -40,6 +41,7 @@ const getAllUsers: NextApiHandler = async (req, res) => {
     return setApiErrorMessage(res, error);
   }
 };
+
 const allUsersHandler: NextApiHandler = (req, res) => {
   switch (req.method) {
     case "GET":
