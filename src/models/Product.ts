@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import IProduct, { ProductDocument } from "types/IProduct";
-import fs from "fs/promises";
-import path from "path";
-import { isFileExists } from "utils/file-api.";
+import { ImageDocument } from "types/IImage";
+import Image from "./Image";
 
 const productSchema: mongoose.Schema<IProduct> = new mongoose.Schema<IProduct>(
   {
@@ -40,19 +39,24 @@ const productSchema: mongoose.Schema<IProduct> = new mongoose.Schema<IProduct>(
 );
 
 productSchema.pre("remove", async function () {
-  const product: ProductDocument = this;
-  // if (product.images && product.images.length) {
-  //   for (let image of product.images) {
-  //     let imagePath: string = path.join(
-  //       ".",
-  //       "public",
-  //       "uploads",
-  //       "products",
-  //       image as string
-  //     );
-  //     if (await isFileExists(imagePath)) await fs.unlink(imagePath);
-  //   }
-  // }
+  const product: ProductDocument & any = this;
+  if (product.images && product.images.length) {
+    for (let image of product.images) {
+      const foundImage: ImageDocument = await Image.findById(
+        image._id.toString()
+      );
+      if (foundImage) {
+        await foundImage.remove();
+      } else {
+        const foundIndex = product.images.findIndex(
+          (image) => image._id.toString() === image._id.toString()
+        );
+        if (foundIndex !== -1) {
+          product.images.splice(foundIndex, 1);
+        }
+      }
+    }
+  }
 });
 
 const Product: mongoose.Model<IProduct> =

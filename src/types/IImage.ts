@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from "mongoose";
 interface IImage {
   src: Buffer | string;
   blur: Buffer | string;
-  productId: mongoose.ObjectId;
+  productId: mongoose.Schema.Types.ObjectId;
 }
 
 export default IImage;

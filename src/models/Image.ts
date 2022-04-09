@@ -31,14 +31,14 @@ imageSchema.methods.toJSON = function () {
 };
 
 imageSchema.pre("save", async function () {
-  const image = this;
+  const image: ImageDocument = this;
   const foundProduct = await Product.findById(image.productId);
   if (!foundProduct) throw new Error("Product not found");
   const foundImageIndex = foundProduct.images.findIndex(
     (imageId) => imageId.toString() === image._id.toString()
   );
   if (foundImageIndex === -1) {
-    foundProduct.images.push(image._id);
+    foundProduct.images.push(image._id as any);
     await foundProduct.save();
   }
 });
