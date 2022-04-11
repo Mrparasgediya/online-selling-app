@@ -1,5 +1,6 @@
 import Navbar from "components/Navbar/Navbar";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
+import { isatty } from "tty";
 
 interface ILayoutUserContainerProps {
   isAdmin: boolean;

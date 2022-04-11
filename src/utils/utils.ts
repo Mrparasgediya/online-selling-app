@@ -20,18 +20,28 @@ export function setDataToObj(obj: any, body: any, validKeys: string[]) {
   return obj;
 }
 
-export const getUserDetailsFromContext = async (
-  ctx: GetServerSidePropsContext
-): Promise<UserContextDetails> => {
-  const { auth } = ctx.req.cookies;
-  if (!auth) return [null, false, auth];
+export const getUserFromToken = async (
+  token: string
+): Promise<UserDocument> => {
+  if (!token) throw new Error("Token not found!");
+
   const {
     data: { user },
   }: AxiosResponse<{ user: UserDocument }> = await API.get(
     "/api/users/current",
     {
-      headers: { Authorization: `Barear ${auth}` },
+      headers: { Authorization: `Barear ${token}` },
     }
   );
+
+  return user;
+};
+
+export const getUserDetailsFromContext = async (
+  ctx: GetServerSidePropsContext
+): Promise<UserContextDetails> => {
+  const { auth } = ctx.req.cookies;
+  if (!auth) return [null, false, auth];
+  const user = await getUserFromToken(auth);
   return [user || null, isAdminUser(user), auth || null];
 };

@@ -1,6 +1,6 @@
 import Products from "components/Products/Products";
 import withLayout from "components/withLayout/withLayout";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { GetStaticProps } from "next";
 import { FC, Fragment } from "react";
 import { ProductDocument } from "types/IProduct";
 import API from "config/axios";
@@ -26,21 +26,10 @@ const Home: FC<IHomeProps> = ({ products }) => {
 
 export default withLayout(Home);
 
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext
-) => {
+export const getStaticProps: GetStaticProps = async () => {
   const props: { [key: string]: any } = {};
   props.base_url = process.env.APP_BASE_URL;
   try {
-    const { auth } = ctx.req.cookies;
-    if (auth) {
-      try {
-        const [user]: UserContextDetails = await getUserDetailsFromContext(ctx);
-        props.user = user;
-      } catch (error) {
-        // here no error will be processed because auth user is not recommended
-      }
-    }
     const { data }: AxiosResponse = await API.get(`/api/products`);
     props.products = data.products || [];
   } catch (error) {
@@ -48,5 +37,16 @@ export const getServerSideProps: GetServerSideProps = async (
   }
   return {
     props,
+    revalidate: 1800,
   };
 };
+
+// const { auth } = ctx.req.cookies;
+//   if (auth) {
+//     try {
+//       const [user]: UserContextDetails = await getUserDetailsFromContext(ctx);
+//       props.user = user;
+//     } catch (error) {
+//       // here no error will be processed because auth user is not recommended
+//     }
+//   }
