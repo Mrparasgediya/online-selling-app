@@ -60,7 +60,7 @@ const Navbar: FC<INavbarProps> = ({ isAdmin, isLoggedIn }) => {
   };
   return (
     <Fragment>
-      <nav className="fixed px-8 py-4 h-auto w-full shadow-lg bg-white/70 backdrop-filter backdrop-blur-md ">
+      <nav className="z-50 h-16 fixed px-8 py-4 h-auto w-full shadow-lg bg-white/70 backdrop-filter backdrop-blur-md ">
         <div className="w-full max-w-screen-lg mx-auto flex items-center justify-between">
           <NextLink href="/" passHref>
             <a className="font-medium text-lg ">Arth Creation</a>

@@ -6,8 +6,6 @@ import { ProductDocument } from "types/IProduct";
 import API from "config/axios";
 import { AxiosResponse } from "axios";
 import { getErrorMessage } from "utils/error";
-import { getUserDetailsFromContext } from "utils/utils";
-import { UserContextDetails } from "types/IUser";
 
 interface IHomeProps {
   products?: ProductDocument[];
@@ -40,13 +38,3 @@ export const getStaticProps: GetStaticProps = async () => {
     revalidate: 1800,
   };
 };
-
-// const { auth } = ctx.req.cookies;
-//   if (auth) {
-//     try {
-//       const [user]: UserContextDetails = await getUserDetailsFromContext(ctx);
-//       props.user = user;
-//     } catch (error) {
-//       // here no error will be processed because auth user is not recommended
-//     }
-//   }

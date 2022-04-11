@@ -16,7 +16,6 @@ interface IProductDetailsPageProps {
 
 const ProductDetailsPage: FC<IProductDetailsPageProps> = ({ product }) => {
   const { name, price, description, _id, images } = product;
-
   return (
     <div className="flex gap-4 mt-4 flex-col md:flex-row">
       <div className="min-h-[280px] md:flex-1 md:min-h-0">
@@ -50,7 +49,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       paths: data.products.map((product) => ({
         params: { productId: product._id.toString() },
       })),
-      fallback: false,
+      fallback: "blocking",
     };
   } catch (error) {
     props.error = getErrorMessage(error);
