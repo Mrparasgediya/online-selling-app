@@ -22,8 +22,8 @@ const ProductDetailsPage: FC<IProductDetailsPageProps> = ({
   return (
     <div className="flex gap-4 mt-4 flex-col md:flex-row">
       <div className="min-h-[280px] md:flex-1 md:min-h-0">
-        <ProductImageSlider images={images} />
-        <ProductImageGrid images={images} />
+        <ProductImageSlider images={images} productName={name}/>
+        <ProductImageGrid images={images}  productName={name}/>
       </div>
       <div className="md:w-2/5 w-full flex flex-col gap-4 ">
         <h1 className="font-semibold text-3xl">{name}</h1>

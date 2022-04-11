@@ -71,6 +71,7 @@ const AddNewProduct = () => {
           ref={productDescriptionInputRef}
           label="Product Description"
           id="productDescription"
+          rows={25}
           required
         ></CustomTextArea>
         <Button type="submit" color="blue">

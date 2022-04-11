@@ -10,10 +10,16 @@ import IImage from "types/IImage";
 
 interface IProductImageSliderProps {
   images: IImage[];
+  productName: string;
 }
 
-const ProductImageSlider: FC<IProductImageSliderProps> = ({ images }) => {
+const ProductImageSlider: FC<IProductImageSliderProps> = ({
+  images,
+  productName,
+}) => {
   const [isValid, setIsValid] = useState<boolean>(false);
+
+  const defaultImageUrl = "/uploads/products/default-image.jpg";
 
   useEffect(() => {
     if (window) {
@@ -32,8 +38,10 @@ const ProductImageSlider: FC<IProductImageSliderProps> = ({ images }) => {
         {images.map((image, idx) => (
           <SwiperSlide key={idx}>
             <NextImage
-              src={`/uploads/products/${image}`}
-              alt="Product img"
+              src={(image.src as string) || defaultImageUrl}
+              alt={
+                `${productName}'s image ${idx + 1}` || `Product img ${idx + 1}`
+              }
               objectFit="cover"
               objectPosition="center"
               height={350}

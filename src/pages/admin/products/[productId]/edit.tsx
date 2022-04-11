@@ -50,15 +50,11 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product }) => {
           }
       }
       if (Object.keys(dataForPayload).length) {
-        const result = await API.put(
-          `/api/products/${_id.toString()}`,
-          dataForPayload,
-          {
-            headers: {
-              Authorization: `Barear ${getToken()}`,
-            },
-          }
-        );
+        await API.put(`/api/products/${_id.toString()}`, dataForPayload, {
+          headers: {
+            Authorization: `Barear ${getToken()}`,
+          },
+        });
       }
       router.push(`/admin/products`);
     } catch (error) {
@@ -107,6 +103,7 @@ const EditProductPage: FC<IEditProductPageProps> = ({ product }) => {
           label="Product Description"
           id="productDescription"
           required
+          rows={25}
           value={formData.description}
           onChange={(e) => {
             setFormData((prevState) => ({

@@ -16,8 +16,8 @@ const AdminProductItem: FC<IAdminProductItemProps> = ({
   const defaultImageUrl = "/uploads/products/default-image.jpg";
 
   return (
-    <div className="flex shadow-lg bg-white/60 backdrop-filter backdrop-blur-md items-start max-w-full rounded-lg overflow-hidden">
-      <div className="flex h-full w-[120px]">
+    <div className="flex h-[160px] items-start shadow-lg bg-white/60 backdrop-filter backdrop-blur-md  max-w-full rounded-lg overflow-hidden">
+      <div className="flex h-[160px] w-[120px]">
         <NextImage
           src={(images[0] && (images[0].src as string)) || defaultImageUrl}
           blurDataURL={

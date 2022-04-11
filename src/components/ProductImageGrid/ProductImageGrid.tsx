@@ -4,9 +4,13 @@ import IImage from "types/IImage";
 
 interface IProductImageGridProps {
   images: IImage[];
+  productName: string;
 }
 
-const ProductImageGrid: FC<IProductImageGridProps> = ({ images }) => {
+const ProductImageGrid: FC<IProductImageGridProps> = ({
+  images,
+  productName,
+}) => {
   const [isValid, setIsValid] = useState<boolean>(false);
 
   useEffect(() => {
@@ -24,7 +28,9 @@ const ProductImageGrid: FC<IProductImageGridProps> = ({ images }) => {
           <NextImage
             key={idx}
             src={(image.src as string) || defaultImageUrl}
-            alt="Product img"
+            alt={
+              `${productName}'s image ${idx + 1}` || `Product img ${idx + 1}`
+            }
             objectFit="cover"
             objectPosition="center"
             height={350}
