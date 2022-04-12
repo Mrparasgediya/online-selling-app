@@ -14,9 +14,11 @@ const LayoutContainer: FC<ILayoutUserContainerProps> = ({
   children,
 }) => {
   return (
-    <div className="min-h-screen relative w-full">
+    <div className="min-h-screen relative h-screen w-full">
       <Navbar isAdmin={isAdmin} isLoggedIn={isLoggedIn} />
-      <div className="mx-auto max-w-screen-lg p-4 pt-24">{children}</div>
+      <div className="mx-auto min-h-[95vh] max-w-screen-lg p-4 md:pt-24 pt-20">
+        {children}
+      </div>
       <Footer />
     </div>
   );

@@ -28,28 +28,31 @@ const ProductImageSlider: FC<IProductImageSliderProps> = ({
   }, []);
   return (
     isValid && (
-      <Swiper
-        modules={[Navigation, Pagination]}
-        spaceBetween={50}
-        slidesPerView={1}
-        navigation
-        pagination={{ clickable: true }}
-      >
-        {images.map((image, idx) => (
-          <SwiperSlide key={idx}>
-            <NextImage
-              src={(image.src as string) || defaultImageUrl}
-              alt={
-                `${productName}'s image ${idx + 1}` || `Product img ${idx + 1}`
-              }
-              objectFit="cover"
-              objectPosition="center"
-              height={350}
-              width={400}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="p-3 relative rounded-md  shadow-lg bg-white/70 backdrop-filter backdrop-blur-lg">
+        <Swiper
+          modules={[Navigation, Pagination]}
+          spaceBetween={50}
+          slidesPerView={1}
+          navigation
+          pagination={{ clickable: true }}
+        >
+          {images.map((image, idx) => (
+            <SwiperSlide key={idx}>
+              <NextImage
+                src={(image.src as string) || defaultImageUrl}
+                alt={
+                  `${productName}'s image ${idx + 1}` ||
+                  `Product img ${idx + 1}`
+                }
+                objectFit="cover"
+                objectPosition="center"
+                height={350}
+                width={400}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     )
   );
 };
