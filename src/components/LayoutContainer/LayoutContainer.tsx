@@ -1,3 +1,4 @@
+import Footer from "components/Footer/Footer";
 import Navbar from "components/Navbar/Navbar";
 import React, { FC, useEffect } from "react";
 import { isatty } from "tty";
@@ -16,6 +17,7 @@ const LayoutContainer: FC<ILayoutUserContainerProps> = ({
     <div className="min-h-screen relative w-full">
       <Navbar isAdmin={isAdmin} isLoggedIn={isLoggedIn} />
       <div className="mx-auto max-w-screen-lg p-4 pt-24">{children}</div>
+      <Footer />
     </div>
   );
 };
